@@ -1,18 +1,38 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable react/prop-types */
 // import useStore from "@/store";
-import { Handle, NodeToolbar, Position } from "@xyflow/react";
+import useStore from "@/store";
+import { Handle, NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import {  FilePenLine, Timer, Trash } from "lucide-react";
 
 const DelayNodeCard = ({ data }) => {
-  // const {onOutreachBlockModalOpen} = useStore();
+  const {selectedLeads,updateLead} = useStore();
+  const {setNodes,setEdges} = useReactFlow();
 
   const editHandler = () => {
     // onOutreachBlockModalOpen();
   };
-
   const deleteHandler = () => {
-    // onOutreachBlockModalOpen();
+    const findNextNodeIndex =
+      selectedLeads[0]?.nodes?.findIndex((node) => node.id === data.nodeId) + 1;
+    let newEdges = [...selectedLeads[0]?.edges]
+      ?.map((edge) =>
+        edge?.target === data.nodeId
+          ? { ...edge, target: selectedLeads[0]?.nodes[findNextNodeIndex]?.id }
+          : edge
+      )
+      ?.filter((edge) => edge.source !== data.nodeId);
+    let newNodes = [...selectedLeads[0]?.nodes]?.filter(
+      (node) => node.id !== data.nodeId
+    );
+    console.log(newEdges, newNodes, findNextNodeIndex);
+    setNodes([...newNodes]);
+    setEdges([...newEdges]);
+    updateLead([
+      { ...selectedLeads[0], nodes: [...newNodes], edges: [...newEdges] },
+    ]);
   };
+
   return (
     <div
       onClick={() => {}}
