@@ -1,0 +1,62 @@
+{
+  "leadsListData": [
+    {
+      "id": "1",
+      "name": "Test List"
+    },
+    {
+      "id": "2",
+      "name": "Test List Sample"
+    },
+    {
+      "id": "3",
+      "name": "SalesBlink Demo"
+    },
+    {
+      "id": "4",
+      "name": "Introduction List"
+    }
+  ],
+  "coldEmailsData": [
+    {
+      "id": "1",
+      "name": "AI Assisted Email"
+    },
+    {
+      "id": "2",
+      "name": "AI Assisted - Followup 1"
+    },
+    {
+      "id": "3",
+      "name": "AI Assisted - Followup 2"
+    },
+    {
+      "id": "4",
+      "name": "AI Assisted - Followup 3"
+    }
+  ],
+  "coldEmailTypesData": [
+    {
+      "id": "1",
+      "name": "New Email"
+    },
+    {
+      "id": "2",
+      "name": "RE: Follow up"
+    }
+  ],
+  "waitTypesData": [
+    {
+      "id": "1",
+      "name": "Days"
+    },
+    {
+      "id": "2",
+      "name": "Hours"
+    },
+    {
+      "id": "3",
+      "name": "Weeks"
+    }
+  ]
+}
