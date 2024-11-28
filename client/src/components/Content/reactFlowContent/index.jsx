@@ -1,6 +1,7 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useCallback, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useCallback, useEffect, useMemo } from "react";
 import {
   Background,
   ReactFlow,
@@ -14,15 +15,44 @@ import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "../nodes";
 import { edgeTypes } from "../edges/types";
 
-const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
+const HORIZONTAL_SPACING = 200; // Horizontal space between nodes
+const VERTICAL_SPACING = 100;   // Vertical space between nodes
 
+const autoLayoutNodes = (nodes) => {
+  // If no nodes, return empty array
+  if (nodes.length === 0) return [];
+
+  // Sort nodes by their original order to maintain sequence
+  const sortedNodes = [...nodes].sort((a, b) => {
+    // If nodes have a creation timestamp or index, use that
+    const indexA = a.data?.index || 0;
+    const indexB = b.data?.index || 0;
+    return indexA - indexB;
+  });
+
+  return sortedNodes.map((node, index) => ({
+    ...node,
+    position: {
+      x: index * HORIZONTAL_SPACING, // Spread nodes horizontally
+      y: index * VERTICAL_SPACING,   // Spread nodes vertically
+    },
+  }));
+};
+
+const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
   const initialNodes = Array.isArray(lead?.nodes) ? lead.nodes : [];
   const initialEdges = Array.isArray(lead?.edges) ? lead.edges : [];
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+
+  // Auto-layout nodes when first loaded
+  const autoLayoutInitialNodes = useMemo(() => {
+    return autoLayoutNodes(initialNodes);
+  }, [initialNodes]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(autoLayoutInitialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
   const onConnect = useCallback(
     (connection) => {
-      // Add a validation check to ensure handle IDs are not null
       if (connection.source && connection.target) {
         setEdges((edges) => addEdge(connection, edges));
       } else {
@@ -35,6 +65,7 @@ const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
     [setEdges]
   );
 
+  // Improved node positioning when nodes change
   useEffect(() => {
     const newNodeData = nodes.map(({ id, type, data, position }) => ({
       id,
@@ -53,28 +84,36 @@ const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
       return l;
     });
 
-    // Only update if there are changes
     updateLead(newLeads);
   }, [nodes]);
 
-  // console.log(lead,nodes,edges)
+  // Function to add a new node with auto-positioning
+  const addNodeWithAutoLayout = useCallback((newNode) => {
+    setNodes((currentNodes) => {
+      const updatedNodes = autoLayoutNodes([...currentNodes, newNode]);
+      return updatedNodes;
+    });
+  }, [setNodes]);
+
+  const onNodeDrag = useCallback((event, node) => {
+    // console.log('Node dragged', node);
+  }, []);
 
   return (
-    <>
-      <ReactFlow
-        nodes={nodes}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        edges={edges}
-        edgeTypes={edgeTypes}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-        attributionPosition="top-right"
-      >
-        <Background color="#aaa" gap={16} />
-      </ReactFlow>
-    </>
+    <ReactFlow
+      nodes={nodes}
+      nodeTypes={nodeTypes}
+      onNodesChange={onNodesChange}
+      edges={edges}
+      edgeTypes={edgeTypes}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
+      onNodeDrag={onNodeDrag}
+      fitView
+      attributionPosition="top-right"
+    >
+      <Background color="#aaa" gap={16} />
+    </ReactFlow>
   );
 };
 
