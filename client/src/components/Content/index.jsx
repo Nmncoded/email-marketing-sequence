@@ -6,6 +6,7 @@ import { OutreachMainModal } from "../modals/outreach-main-modal";
 import { OutreachBlockModal } from "../modals/outreach-block-modal";
 import { OutreachConditionsModal } from "../modals/outreach-conditions-modal";
 import { useReactFlow } from "@xyflow/react";
+import { SaveScheduleModal } from "../modals/save-modal";
 
 export default function Content() {
   const {
@@ -20,6 +21,8 @@ export default function Content() {
     onOutreachBlockModalClose,
     outreachConditionModalOpen,
     onOutreachConditionModalClose,
+    saveScheduleModalOpen,
+    onSaveScheduleModalClose,
   } = useStore();
   const {getNodes} = useReactFlow();
   const nodes = getNodes();
@@ -27,6 +30,10 @@ export default function Content() {
 
   return (
     <div className="w-screen h-screen flex flex-col">
+      {
+        Boolean(saveScheduleModalOpen) &&
+        <SaveScheduleModal title={"Save & Schedule"} isOpen={Boolean(saveScheduleModalOpen)} onClose={onSaveScheduleModalClose} />
+      }
       {
         Boolean(isOpen) &&
         <LeadSourceModal

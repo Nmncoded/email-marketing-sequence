@@ -6,7 +6,8 @@ import useStore from "@/store";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const {selectedLeads} = useStore();
+  const {selectedLeads, onSaveScheduleModalOpen} = useStore();
+  const isDisabled = !selectedLeads[0]?.nodes?.some((node) => node.type === "email-node") ;
 
   const addLeadHandler = () => {
     if(selectedLeads?.length > 0) return;
@@ -14,6 +15,8 @@ const Header = () => {
   };
 
   const clickHandler = () => {
+    if(isDisabled) return;
+    onSaveScheduleModalOpen();
   };
 
   return (
@@ -38,6 +41,7 @@ const Header = () => {
         </Button>
         <Button
           onClick={clickHandler}
+          disabled={isDisabled}
           className="cursor-pointer flex justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
         >
           <span>

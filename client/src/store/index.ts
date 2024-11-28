@@ -22,6 +22,7 @@ const initialState = {
   outreachBlockModalOpen: false,
   outreachMainModalOpen: false,
   outreachConditionModalOpen: false,
+  saveScheduleModalOpen: false,
 }
 
 const useStore = create(
@@ -31,6 +32,10 @@ const useStore = create(
       onOutreachBlockModalOpen: () => set({ outreachBlockModalOpen: true }),
       onOutreachMainModalOpen: (data:any) => set({ outreachMainModalOpen: data || true }),
       onOutreachConditionModalOpen: (data:any) => set({ outreachConditionModalOpen: data || true }),
+      onSaveScheduleModalOpen : (data:any) => set({ saveScheduleModalOpen: data || true }),
+
+
+      onSaveScheduleModalClose : (data:any) => set({ saveScheduleModalOpen: false }),
       onOutreachBlockModalClose: () => set({ outreachBlockModalOpen: false }),
       onOutreachMainModalClose: () => set({ outreachMainModalOpen: false }),
       onOutreachConditionModalClose: () => set({ outreachConditionModalOpen: false }),
