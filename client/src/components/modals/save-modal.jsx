@@ -38,6 +38,9 @@ const formSchema = z.object({
   email: z.string().min(1, {
     message: "Field is required",
   }),
+  body: z.string().min(1, {
+    message: "Field is required",
+  }),
   subject: z.string().min(1, {
     message: "Field is required",
   }),
@@ -66,14 +69,14 @@ export const SaveScheduleModal = ({
 
   const onSubmit = async (data) => {
     console.log(data);
-    const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
-    const res = await axios.post("http://localhost:3000/schedule-email", {
+    // const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
+    const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/schedule-email`, {
       email: data.email,
       subject: data.subject,
       body: data.body,
-      // scheduledTime: `${data.wait}-${waitType.name.toLowerCase()}`
+      scheduledTime: `${data.wait}`
     });
-    // console.log(res);
+    console.log(res);
 
     onClose();
   };

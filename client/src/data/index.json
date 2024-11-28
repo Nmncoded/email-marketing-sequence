@@ -48,15 +48,7 @@
   "waitTypesData": [
     {
       "id": "1",
-      "name": "Days"
-    },
-    {
-      "id": "2",
-      "name": "Hours"
-    },
-    {
-      "id": "3",
-      "name": "Weeks"
+      "name": "Mins"
     }
   ]
 }
