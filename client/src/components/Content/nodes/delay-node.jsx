@@ -6,11 +6,11 @@ import { Handle, NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import {  FilePenLine, Timer, Trash } from "lucide-react";
 
 const DelayNodeCard = ({ data }) => {
-  const {selectedLeads,updateLead} = useStore();
+  const {selectedLeads, updateLead, onOutreachConditionModalOpen} = useStore();
   const {setNodes,setEdges} = useReactFlow();
 
   const editHandler = () => {
-    // onOutreachBlockModalOpen();
+    onOutreachConditionModalOpen(data)
   };
   const deleteHandler = () => {
     const findNextNodeIndex =

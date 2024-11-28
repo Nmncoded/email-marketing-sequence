@@ -5,6 +5,7 @@ import { CircleX } from "lucide-react";
 import { OutreachMainModal } from "../modals/outreach-main-modal";
 import { OutreachBlockModal } from "../modals/outreach-block-modal";
 import { OutreachConditionsModal } from "../modals/outreach-conditions-modal";
+import { useReactFlow } from "@xyflow/react";
 
 export default function Content() {
   const {
@@ -20,38 +21,54 @@ export default function Content() {
     outreachConditionModalOpen,
     onOutreachConditionModalClose,
   } = useStore();
-
-  console.log(selectedLeads);
+  const {getNodes} = useReactFlow();
+  const nodes = getNodes();
+  // console.log(selectedLeads,nodes);
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <LeadSourceModal
-        title="Leads from List(s)"
-        description="Connect multiple lists as source for this sequence."
-        isOpen={Boolean(isOpen)}
-        onClose={onClose}
-      />
+      {
+        Boolean(isOpen) &&
+        <LeadSourceModal
+          title="Leads from List(s)"
+          description="Connect multiple lists as source for this sequence."
+          isOpen={Boolean(isOpen)}
+          onClose={onClose}
+        />
+      }
+      {
+        Boolean(outreachMainModalOpen) &&
       <OutreachMainModal
         title={"Cold Email"}
         description={"Send an email to a lead."}
         isOpen={Boolean(outreachMainModalOpen)}
         onClose={onOutreachMainModalClose}
+        initialData={typeof outreachMainModalOpen === 'object' ? outreachMainModalOpen : null}
       />
+      }
+      {
+        Boolean(outreachBlockModalOpen) &&
       <OutreachBlockModal
         nodes={null}
         isOpen={Boolean(outreachBlockModalOpen)}
         onClose={onOutreachBlockModalClose}
         title={"Add Blocks"}
+        nodesData={nodes}
         description={
           "Pick a block & configure,  any new leads that match rules will be added to sequence automatically."
         }
       />
+      }
+      {
+        Boolean(outreachConditionModalOpen) &&
       <OutreachConditionsModal
         title={"Wait"}
         description={"Add a delay between blocks."}
         isOpen={Boolean(outreachConditionModalOpen)}
         onClose={onOutreachConditionModalClose}
+        initialData={ typeof outreachConditionModalOpen === 'object' ? outreachConditionModalOpen : null}
       />
+      }
 
       {selectedLeads.length === 0 && (
         <div className="flex flex-col items-center justify-center flex-grow">

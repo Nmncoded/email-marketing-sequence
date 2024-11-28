@@ -23,6 +23,7 @@ import {
 } from "../ui/select";
 import { coldEmailsData, coldEmailTypesData } from "../../data";
 import useStore from "@/store";
+import { useReactFlow } from "@xyflow/react";
 // import toast from "react-hot-toast";
 
 const formSchema = z.object({
@@ -39,14 +40,19 @@ export const OutreachMainModal = ({
   description,
   isOpen,
   onClose,
-  action = "Insert",
   initialData = null,
 }) => {
+  const { setNodes } = useReactFlow();
+  const action =
+    initialData && typeof initialData === "object" ? "Update" : "Insert";
   const { updateLead, selectedLeads } = useStore();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? { ...initialData }
+      ? {
+          typeId: initialData?.type?.id,
+          emailTemplateId: initialData?.template?.id,
+        }
       : {
           emailTemplateId: "",
           typeId: "",
@@ -71,8 +77,8 @@ export const OutreachMainModal = ({
       id: nodeId,
       type: "email-node",
       position: {
-        x: nodes[nodes.length - 1]?.position?.x || 0,
-        y: nodes[nodes.length - 1]?.position?.y + 60 || 0,
+        x: nodes[nodes.length - 2]?.position?.x + 100 || 0,
+        y: nodes[nodes.length - 2]?.position?.y + 50 || 0,
       },
       data: { template: emailTemplate, type: emailType, nodeId },
     };
@@ -104,6 +110,30 @@ export const OutreachMainModal = ({
     window.location.reload();
   };
 
+  const onUpdate = async (data) => {
+    // console.log(data);
+    const emailTemplate = coldEmailsData.find(
+      (item) => item.id === data.emailTemplateId
+    );
+    const emailType = coldEmailTypesData.find(
+      (item) => item.id === data.typeId
+    );
+    let newNodes = [...selectedLeads[0]?.nodes]?.map((node) =>
+      node.id == initialData.nodeId
+        ? {
+            ...node,
+            data: { ...node?.data, template: emailTemplate, type: emailType },
+          }
+        : node
+    );
+    // console.log( newNodes );
+    setNodes([...newNodes]);
+    updateLead([{ ...selectedLeads[0], nodes: [...newNodes] }]);
+    onClose();
+  };
+
+  // console.log(action,initialData);
+
   return (
     <Modal
       title={title || "Cold Email"}
@@ -128,7 +158,11 @@ export const OutreachMainModal = ({
           </div>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={
+                initialData && typeof initialData === "object"
+                  ? form.handleSubmit(onUpdate)
+                  : form.handleSubmit(onSubmit)
+              }
               className="w-full flex flex-col gap-2"
             >
               <FormField

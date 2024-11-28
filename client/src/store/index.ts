@@ -29,8 +29,8 @@ const useStore = create(
     (set, get) => ({
       ...initialState,
       onOutreachBlockModalOpen: () => set({ outreachBlockModalOpen: true }),
-      onOutreachMainModalOpen: () => set({ outreachMainModalOpen: true }),
-      onOutreachConditionModalOpen: () => set({ outreachConditionModalOpen: true }),
+      onOutreachMainModalOpen: (data:any) => set({ outreachMainModalOpen: data || true }),
+      onOutreachConditionModalOpen: (data:any) => set({ outreachConditionModalOpen: data || true }),
       onOutreachBlockModalClose: () => set({ outreachBlockModalOpen: false }),
       onOutreachMainModalClose: () => set({ outreachMainModalOpen: false }),
       onOutreachConditionModalClose: () => set({ outreachConditionModalOpen: false }),

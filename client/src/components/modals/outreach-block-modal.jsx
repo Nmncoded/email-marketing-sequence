@@ -34,7 +34,7 @@ const conditionsData = [
   },
 ];
 
-export const OutreachBlockModal = ({ title, description, isOpen, onClose, nodes = null }) => {
+export const OutreachBlockModal = ({ title, description, isOpen, onClose, nodesData = null }) => {
   const {  selectedLeads, onOutreachMainModalOpen, onOutreachConditionModalOpen } = useStore();
 
   const onClick = (item,type) => {
@@ -79,7 +79,7 @@ export const OutreachBlockModal = ({ title, description, isOpen, onClose, nodes 
           ))}
         </div>
       </div>
-      {/* {nodes?.some((node) => node.type === "email-node") && ( */}
+      {nodesData?.some((node) => node.type === "email-node") && (
         <div>
           <h1 className="text-xl">Conditions</h1>
           <div className="py-3">
@@ -104,7 +104,7 @@ export const OutreachBlockModal = ({ title, description, isOpen, onClose, nodes 
             ))}
           </div>
         </div>
-      {/* )} */}
+      )}
     </Modal>
   );
 };

@@ -20,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import {  waitTypesData } from "../../data";
+import { waitTypesData } from "../../data";
 import { Input } from "../ui/input";
 import useStore from "@/store";
+import { useReactFlow } from "@xyflow/react";
 // import toast from "react-hot-toast";
 
 const formSchema = z.object({
@@ -39,14 +40,15 @@ export const OutreachConditionsModal = ({
   description,
   isOpen,
   onClose,
-  action = "Insert",
   initialData = null,
 }) => {
+  const { setNodes } = useReactFlow();
+  const action = initialData && typeof initialData === 'object' ? "Update" : "Insert";
   const { updateLead, selectedLeads } = useStore();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? { ...initialData }
+      ? { ...initialData, waitTypeId: initialData?.type?.id }
       : {
           wait: "",
           waitTypeId: "",
@@ -55,9 +57,7 @@ export const OutreachConditionsModal = ({
 
   const onSubmit = async (data) => {
     // console.log(data);
-    const waitType = waitTypesData.find(
-      (item) => item.id === data.waitTypeId
-    );
+    const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
     const currentLead = selectedLeads[0];
     const nodes = [...currentLead?.nodes];
     const edges = [...currentLead?.edges];
@@ -68,8 +68,8 @@ export const OutreachConditionsModal = ({
       id: nodeId,
       type: "delay-node",
       position: {
-        x: nodes[nodes.length - 1]?.position?.x + 100 || 0,
-        y: nodes[nodes.length - 1]?.position?.y || 0,
+        x: nodes[nodes.length - 2]?.position?.x || 0,
+        y: nodes[nodes.length - 2]?.position?.y+50 || 0,
       },
       data: { wait: data?.wait, type: waitType, nodeId },
     };
@@ -101,6 +101,24 @@ export const OutreachConditionsModal = ({
     window.location.reload();
   };
 
+  const onUpdate = async (data) => {
+    // console.log(data);
+    const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
+
+    let newNodes = [...selectedLeads[0]?.nodes]?.map((node) =>
+      node.id == initialData.nodeId
+        ? {
+            ...node,
+            data: { ...node?.data, type: waitType, wait: data?.wait },
+          }
+        : node
+    );
+    // console.log( newNodes );
+    setNodes([...newNodes]);
+    updateLead([{ ...selectedLeads[0], nodes: [...newNodes] }]);
+    onClose();
+  };
+
   return (
     <Modal
       title={title || "Wait"}
@@ -113,7 +131,11 @@ export const OutreachConditionsModal = ({
         <div className="py-6">
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={
+                typeof initialData === "object" && initialData
+                  ? form.handleSubmit(onUpdate)
+                  : form.handleSubmit(onSubmit)
+              }
               className="w-full flex flex-col gap-2"
             >
               <FormField

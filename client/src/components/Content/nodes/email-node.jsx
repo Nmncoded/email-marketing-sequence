@@ -6,10 +6,12 @@ import { Handle, NodeToolbar, Position, useReactFlow } from "@xyflow/react";
 import { FilePenLine, Mail, Trash } from "lucide-react";
 
 const EmailNodeCard = ({ data }) => {
-  const { selectedLeads, updateLead } = useStore();
+  const { selectedLeads, updateLead,onOutreachMainModalOpen } = useStore();
   const {setNodes,setEdges} = useReactFlow();
 
-  const editHandler = () => {};
+  const editHandler = () => {
+    onOutreachMainModalOpen(data)
+  };
 
 
   const deleteHandler = () => {
@@ -25,7 +27,7 @@ const EmailNodeCard = ({ data }) => {
     let newNodes = [...selectedLeads[0]?.nodes]?.filter(
       (node) => node.id !== data.nodeId
     );
-    console.log(newEdges, newNodes, findNextNodeIndex);
+    // console.log(newEdges, newNodes, findNextNodeIndex);
     setNodes([...newNodes]);
     setEdges([...newEdges]);
     updateLead([
