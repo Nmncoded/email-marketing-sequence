@@ -68,7 +68,7 @@ export const SaveScheduleModal = ({
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
+    console.log(data, `${import.meta.env.VITE_BASE_URL}/schedule-email`);
     // const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
     const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/schedule-email`, {
       email: data.email,
