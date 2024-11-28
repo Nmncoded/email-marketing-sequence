@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Background,
   ReactFlow,
@@ -43,13 +43,25 @@ const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
   const initialNodes = Array.isArray(lead?.nodes) ? lead.nodes : [];
   const initialEdges = Array.isArray(lead?.edges) ? lead.edges : [];
 
-  // Auto-layout nodes when first loaded
   const autoLayoutInitialNodes = useMemo(() => {
     return autoLayoutNodes(initialNodes);
   }, [initialNodes]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(autoLayoutInitialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const updateLeadTimeout = useRef(null);
+
+  const debouncedUpdateLead = useCallback((newLeads) => {
+    if (updateLeadTimeout.current) {
+      clearTimeout(updateLeadTimeout.current);
+    }
+
+    updateLeadTimeout.current = setTimeout(() => {
+      updateLead(newLeads);
+      updateLeadTimeout.current = null;
+    }, 300); // 300ms debounce time
+  }, [updateLead]);
 
   const onConnect = useCallback(
     (connection) => {
@@ -65,7 +77,6 @@ const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
     [setEdges]
   );
 
-  // Improved node positioning when nodes change
   useEffect(() => {
     const newNodeData = nodes.map(({ id, type, data, position }) => ({
       id,
@@ -84,16 +95,15 @@ const ReactFlowContent = ({ lead, selectedLeads, updateLead }) => {
       return l;
     });
 
-    updateLead(newLeads);
-  }, [nodes]);
+    debouncedUpdateLead(newLeads);
 
-  // Function to add a new node with auto-positioning
-  const addNodeWithAutoLayout = useCallback((newNode) => {
-    setNodes((currentNodes) => {
-      const updatedNodes = autoLayoutNodes([...currentNodes, newNode]);
-      return updatedNodes;
-    });
-  }, [setNodes]);
+    return () => {
+      if (updateLeadTimeout.current) {
+        clearTimeout(updateLeadTimeout.current);
+      }
+    };
+  }, [nodes, lead, selectedLeads, debouncedUpdateLead]);
+
 
   const onNodeDrag = useCallback((event, node) => {
     // console.log('Node dragged', node);
