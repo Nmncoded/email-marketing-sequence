@@ -16,7 +16,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/schedule-email": {
-        target: "https://ems-be-pearl.vercel.app",
+        target: "https://ems-be-jjg9.onrender.com",
         changeOrigin: true,
         secure: false,
       },
