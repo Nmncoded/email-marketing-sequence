@@ -24,9 +24,10 @@ import {
 import { waitTypesData } from "../../data";
 import { Input } from "../ui/input";
 import axios from "axios";
+import { useState } from "react";
 // import useStore from "@/store";
 // import { useReactFlow } from "@xyflow/react";
-// import toast from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   wait: z.string().min(1, {
@@ -55,6 +56,7 @@ export const SaveScheduleModal = ({
 }) => {
   // const { setNodes } = useReactFlow();
   const action = "Schedule";
+  const [isLoading, setIsLoading] = useState(false);  
   // const { updateLead, selectedLeads } = useStore();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -68,15 +70,18 @@ export const SaveScheduleModal = ({
   });
 
   const onSubmit = async (data) => {
-    console.log(data, `${import.meta.env.VITE_BASE_URL}/schedule-email`);
+    // console.log(data, `${import.meta.env.VITE_BASE_URL}/schedule-email`);
     // const waitType = waitTypesData.find((item) => item.id === data.waitTypeId);
+    setIsLoading(true);
     const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/schedule-email`, {
       email: data.email,
       subject: data.subject,
       body: data.body,
       scheduledTime: `${data.wait}`
     });
-    console.log(res);
+    // console.log(res);
+    setIsLoading(false);
+    toast.success("Email scheduled successfully");
 
     onClose();
   };
@@ -202,7 +207,7 @@ export const SaveScheduleModal = ({
                 )}
               />
               <Button
-                // disabled={form.getValues("wait") === ""}
+                disabled={isLoading}
                 type="submit"
                 className="ml-auto cursor-pointer text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-sm text-sm py-2.5"
               >
